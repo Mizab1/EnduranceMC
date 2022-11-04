@@ -1,0 +1,19 @@
+{
+  "C:\\Users\\Mizab\\AppData\\Roaming\\.minecraft\\_Sandstone Projects\\EnduranceMC\\src": {
+    "files": {
+      "pack.mcmeta": "4cc075fb68f9a472349711f0a6a915e1",
+      "data\\endurance\\functions\\levels\\lvl1\\setup.mcfunction": "5f89822556272242bb98665464270bd5",
+      "data\\endurance\\functions\\levels\\lvl1\\button_pressed.mcfunction": "8484b97f2de06854ea7e684429827066",
+      "data\\endurance\\functions\\load.mcfunction": "48062b3137564e8724a1b9612b7e801d",
+      "data\\endurance\\functions\\tick.mcfunction": "d4c49615c656eb4eb017ee18ab98e91e",
+      "data\\endurance\\functions\\tick\\execute_as.mcfunction": "9ecc357e8a095f3a048b231b9dd57b49",
+      "data\\endurance\\functions\\tick\\execute_as\\if.mcfunction": "444f3d83d25e0e7f5a3f750fa4b39379",
+      "data\\endurance\\functions\\uninstall\\remove_scores.mcfunction": "d4de0dcbdf9cafbd67cb42009949eeba",
+      "data\\endurance\\functions\\uninstall\\remove_tags.mcfunction": "b35b6221788520b8602edba20a5b42c5",
+      "data\\endurance\\functions\\__init__.mcfunction": "564948308006cdf26b44d34934d8185a",
+      "data\\minecraft\\tags\\functions\\load.json": "e2e676858e6c492f9eab7e80059f9f80",
+      "data\\minecraft\\tags\\functions\\tick.json": "4be13d955f18f0935295d833e7abce56"
+    },
+    "resultFolder": "C:\\Users\\Mizab\\AppData\\Roaming\\.minecraft\\saves\\Endurance\\datapacks\\Endurance MC"
+  }
+}
