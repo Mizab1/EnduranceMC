@@ -2,26 +2,30 @@ import { clear, effect, execute, gamemode, give, MCFunction, Objective, playsoun
 import { clearedLevel1Tag, clearedLevel2Tag, failedTag, tpLvl2 } from "../constants";
 import { failedFunction, self } from "../main";
 import { checkKey } from "../predicates";
+import { setupLevel3 } from "./level3";
 
 // key command
 // /give @p tripwire_hook{display:{Name:'{"text":"Key","color":"gold","italic":false}'},CustomModelData:0001} 1
 
+const tagLevel = clearedLevel2Tag;
+const previousLevel = clearedLevel1Tag;
+
 // neccessary vars
-const totalPlayersThatClearedLevel1Obj = Objective.create(
+const totalPlayersThatClearedLevel2Obj = Objective.create(
     'limit_level2',
     'dummy'
 );
-export const totalPlayersThatClearedLevel2 = totalPlayersThatClearedLevel1Obj('player_cleared_lvl_2');
+export const totalPlayersThatClearedLevel2 = totalPlayersThatClearedLevel2Obj('player_cleared_lvl_2');
 
 // setup
 export const setupLevel2 = MCFunction('levels/lvl2/setup', () => {
-    gamemode('survival', Selector('@a', {
-        tag: [clearedLevel1Tag, '!' + failedTag]
+    gamemode('adventure', Selector('@a', {
+        tag: [previousLevel, '!' + failedTag]
     }));
 
     give(Selector('@a', {
         gamemode: '!spectator'
-    }), 'minecraft:diamond_pickaxe' + `{ display:{ Name:'{ "text":"Super Pickaxe","color":"gold","italic":false }' }, CustomModelData:0011, Enchantments:[{ id:"minecraft:efficiency", lvl:10s }]}`, 1)
+    }), 'minecraft:diamond_pickaxe' + `{CanDestroy:["minecraft:cobbled_deepslate"],display:{Name:'{"text":"Super Pickaxe","color":"gold","italic":false}'},CustomModelData:0011,Enchantments:[{id:"minecraft:efficiency",lvl:10s}]}`, 1)
 
     tp('@a', tpLvl2, ["-120", "0"]);
     playsound('minecraft:block.note_block.chime', 'master', '@a', tpLvl2, 1, 0.5);
@@ -56,11 +60,11 @@ export const clearedLvl2 = () => {
     execute.as(Selector('@a', { gamemode: "!spectator" })).at(self).run(() => {
         _.if(_.and(Selector('@s', {
             predicate: checkKey
-        }), Selector('@s', { tag: '!' + clearedLevel2Tag })), () => {
+        }), Selector('@s', { tag: '!' + tagLevel })), () => {
             clear(self, 'minecraft:tripwire_hook');
             playsound('minecraft:block.note_block.chime', 'master', self)
             gamemode('spectator', self);
-            tag(self).add(clearedLevel2Tag);
+            tag(self).add(tagLevel);
             title(self).title([{ text: "Level 2 Cleared!", color: "gold" }]);
             title(self).subtitle([{ text: "Good Job!", color: "gold" }]);
 
@@ -69,15 +73,15 @@ export const clearedLvl2 = () => {
     })
 }
 
-// level 1 complition
+// level 2 complition
 export const lvl2Complition = MCFunction('levels/lvl2/complition', async () => {
 
     // elimination
-    failedFunction(clearedLevel2Tag);
+    failedFunction(tagLevel);
 
     await sleep('10t');
     clear('@a', 'minecraft:diamond_pickaxe');
-    execute.as(Selector('@a', { tag: [clearedLevel2Tag, '!' + failedTag] })).at(self).run(() => {
+    execute.as(Selector('@a', { tag: [tagLevel, '!' + failedTag] })).at(self).run(() => {
         title(self).title([
             {
                 text: "You cleared Level 2!",
@@ -87,6 +91,5 @@ export const lvl2Complition = MCFunction('levels/lvl2/complition', async () => {
         playsound('minecraft:ui.toast.challenge_complete', 'master', self)
     })
     effect.give('@a', 'minecraft:blindness', 3, 0, true);
-    // await sleep('30t');
-
+    setupLevel3();
 })

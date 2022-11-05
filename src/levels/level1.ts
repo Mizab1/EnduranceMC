@@ -24,10 +24,12 @@ const totalPlayersThatClearedLevel1Obj = Objective.create(
 export const totalPlayersThatClearedLevel1 = totalPlayersThatClearedLevel1Obj('player_cleared_lvl_1');
 
 
+const tagLevel = clearedLevel1Tag;
+
 // setup
 export const setupLevel1 = MCFunction('levels/lvl1/setup', () => {
-    gamemode('survival', Selector('@a', {
-        tag: [clearedLevel1Tag, '!' + failedTag]
+    gamemode('adventure', Selector('@a', {
+        tag: ['!' + failedTag]
     }));
 
     tp('@a', tpLvl1, ["90", "0"]);
@@ -69,10 +71,10 @@ MCFunction('levels/lvl1/button_pressed', () => {
 // player cleared the level
 export const clearedLvl1 = () => {
     execute.as(Selector('@a', { gamemode: "!spectator" })).at(self).run(() => {
-        _.if(_.and(myButtonPressed.matches([maxButtonPressed, null]), Selector('@s', { tag: '!' + clearedLevel1Tag })), () => {
+        _.if(_.and(myButtonPressed.matches([maxButtonPressed, null]), Selector('@s', { tag: '!' + tagLevel })), () => {
             playsound('minecraft:block.note_block.chime', 'master', self)
             gamemode('spectator', self);
-            tag(self).add(clearedLevel1Tag);
+            tag(self).add(tagLevel);
             title(self).title([{ text: "Level 1 Cleared!", color: "gold" }]);
             title(self).subtitle([{ text: "Good Job!", color: "gold" }]);
 
@@ -86,10 +88,10 @@ export const lvl1Complition = MCFunction('levels/lvl1/complition', async () => {
     scoreboard.objectives.remove('button_pressed');
 
     // elimination
-    failedFunction(clearedLevel1Tag);
+    failedFunction(tagLevel);
 
     await sleep('10t');
-    execute.as(Selector('@a', { tag: [clearedLevel1Tag, '!' + failedTag] })).at(self).run(() => {
+    execute.as(Selector('@a', { tag: [tagLevel, '!' + failedTag] })).at(self).run(() => {
         title(self).title([
             {
                 text: "You cleared Level 1!",
