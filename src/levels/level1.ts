@@ -1,6 +1,7 @@
-import { execute, gamemode, MCFunction, Objective, playsound, rel, scoreboard, Selector, tag, tellraw, title, _ } from "sandstone";
-import { clearedLevel1, maxButtonPressed } from "../constants";
-import { self } from "../main";
+import { abs, effect, execute, gamemode, MCFunction, Objective, playsound, rel, say, scoreboard, Selector, sleep, tag, tellraw, title, tp, _ } from "sandstone";
+import { clearedLevel1Tag, failedTag, maxButtonPressed, noOfPlayer, tpLvl1, tpLvl2 } from "../constants";
+import { failedFunction, self } from "../main";
+import { setupLevel2 } from "./level2";
 
 // neccessary vars
 export const buttonPressedObj = Objective.create(
@@ -16,9 +17,22 @@ export const buttonPressedObj = Objective.create(
 export const myButtonPressed = buttonPressedObj('@s');
 export const allButtonPressed = buttonPressedObj('@a');
 
+const totalPlayersThatClearedLevel1Obj = Objective.create(
+    'limit_level1',
+    'dummy'
+);
+export const totalPlayersThatClearedLevel1 = totalPlayersThatClearedLevel1Obj('player_cleared_lvl_1');
+
+
 // setup
-MCFunction('levels/lvl1/setup', () => {
-    tellraw('@a', 
+export const setupLevel1 = MCFunction('levels/lvl1/setup', () => {
+    gamemode('survival', Selector('@a', {
+        tag: [ clearedLevel1Tag, '!' + failedTag ]
+    }));
+
+    tp('@a', tpLvl1, ["90", "0"]);
+    playsound('minecraft:block.note_block.chime', 'master', '@a', tpLvl1, 1, 0.5);
+    tellraw(Selector('@a', { gamemode: '!spectator' }), 
     [
         {
             text: "================ Level 1 ================\n",
@@ -55,12 +69,38 @@ MCFunction('levels/lvl1/button_pressed', () => {
 // player cleared the level
 export const clearedLvl1 = () => {
     execute.as(Selector('@a', { gamemode: "!spectator"})).at(self).run(() => {
-        _.if(_.and(myButtonPressed.matches([maxButtonPressed, null]), Selector('@s', { tag: '!' + clearedLevel1 })), () => {
+        _.if(_.and(myButtonPressed.matches([maxButtonPressed, null]), Selector('@s', { tag: '!' + clearedLevel1Tag })), () => {
+            playsound('minecraft:block.note_block.chime', 'master', self)
             gamemode('spectator', self);
-            tag(self).add(clearedLevel1);
+            tag(self).add(clearedLevel1Tag);
             title(self).title([{ text: "Level 1 Cleared!", color: "gold"}]);
             title(self).subtitle([{ text: "Good Job!", color: "gold"}]);
-            playsound('minecraft:ui.toast.challenge_complete', 'master', self)
+
+            totalPlayersThatClearedLevel1.add(1);
         })
     })
 } 
+
+// level 1 complition
+export const lvl1Complition = MCFunction('levels/lvl1/complition', async () => {
+    scoreboard.objectives.remove('button_pressed');
+
+    // elimination
+    failedFunction(clearedLevel1Tag);
+
+    await sleep('10t');
+    execute.as(Selector('@a', { tag: [ clearedLevel1Tag, '!' + failedTag ]})).at(self).run(() => {
+        title(self).title([
+            {
+                text: "You cleared Level 1!",
+                color: "gold"
+            }
+        ]);
+        playsound('minecraft:ui.toast.challenge_complete', 'master', self)
+    })
+    effect.give('@a', 'minecraft:blindness', 3, 0, true);
+    await sleep('30t');
+
+    // next level
+    setupLevel2();
+})
