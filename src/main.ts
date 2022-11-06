@@ -1,4 +1,4 @@
-import { effect, execute, gamemode, gamerule, MCFunction, Selector, SelectorClass, tag, title, tp, _ } from "sandstone";
+import { effect, execute, gamemode, gamerule, MCFunction, say, Selector, SelectorClass, sleep, tag, title, tp, _ } from "sandstone";
 import { failedTag, hubCoord, noOfPlayer } from "./constants";
 import { clearedLvl1, lvl1Complition, setupLevel1, totalPlayersThatClearedLevel1 } from "./levels/level1";
 import { clearedLvl2, lvl2Complition, totalPlayersThatClearedLevel2 } from "./levels/level2";
@@ -76,4 +76,3 @@ MCFunction('hub_button', () => {
 MCFunction('tp_to_hub', () => {
     tp('@a', hubCoord, ['0', '0'])
 })
-

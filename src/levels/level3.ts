@@ -1,19 +1,20 @@
-import { effect, execute, gamemode, MCFunction, Objective, playsound, rel, Selector, sleep, tag, tellraw, title, tp, _ } from "sandstone";
+import { effect, execute, gamemode, MCFunction, MCFunctionInstance, Objective, ObjectiveInstance, playsound, rel, Score, Selector, sleep, tag, tellraw, title, tp, _ } from "sandstone";
 import { clearedLevel2Tag, clearedLevel3Tag, failedTag, tpLvl3 } from "../constants";
 import { failedFunction, self } from "../main";
+import { setupLevel4 } from "./level4";
 
-const tagLevel = clearedLevel3Tag;
-const previousLevel = clearedLevel2Tag;
+const tagLevel: string = clearedLevel3Tag;
+const previousLevel: string = clearedLevel2Tag;
 
 // neccessary vars
-const totalPlayersThatClearedLevel3Obj = Objective.create(
+const totalPlayersThatClearedLevel3Obj: ObjectiveInstance<string> = Objective.create(
     'limit_level3',
     'dummy'
 );
-export const totalPlayersThatClearedLevel3 = totalPlayersThatClearedLevel3Obj('player_cleared_lvl_3');
+export const totalPlayersThatClearedLevel3: Score<string> = totalPlayersThatClearedLevel3Obj('player_cleared_lvl_3');
 
 // setup
-export const setupLevel3 = MCFunction('levels/lvl3/setup', () => {
+export const setupLevel3: MCFunctionInstance<void> = MCFunction('levels/lvl3/setup', () => {
     gamemode('adventure', Selector('@a', {
         tag: [previousLevel, '!' + failedTag]
     }));
@@ -47,7 +48,7 @@ export const setupLevel3 = MCFunction('levels/lvl3/setup', () => {
 })
 
 // detect fall
-export const detectFall = MCFunction('detect_fall', () => {
+export const detectFall: MCFunctionInstance<void> = MCFunction('detect_fall', () => {
     execute.as('@a').at(self).if(_.block(rel(0, -0.35, 0), 'minecraft:red_stained_glass')).run(() => {
         tellraw(self, [{
             text: "==========================\n",
@@ -80,7 +81,7 @@ export const clearedLvl3 = () => {
 }
 
 // level 3 complition
-export const lvl3Complition = MCFunction('levels/lvl3/complition', async () => {
+export const lvl3Complition: MCFunctionInstance<Promise<void>> = MCFunction('levels/lvl3/complition', async () => {
 
     // elimination
     failedFunction(tagLevel);
@@ -96,4 +97,5 @@ export const lvl3Complition = MCFunction('levels/lvl3/complition', async () => {
         playsound('minecraft:ui.toast.challenge_complete', 'master', self)
     })
     effect.give('@a', 'minecraft:blindness', 3, 0, true);
+    setupLevel4();
 })

@@ -1,10 +1,10 @@
-import { effect, execute, gamemode, MCFunction, Objective, playsound, rel, scoreboard, Selector, sleep, tag, tellraw, title, tp, _ } from "sandstone";
+import { effect, execute, gamemode, MCFunction, MCFunctionInstance, Objective, ObjectiveInstance, playsound, rel, Score, scoreboard, Selector, sleep, tag, tellraw, title, tp, _ } from "sandstone";
 import { clearedLevel1Tag, failedTag, maxButtonPressed, tpLvl1 } from "../constants";
 import { failedFunction, self } from "../main";
 import { setupLevel2 } from "./level2";
 
 // neccessary vars
-export const buttonPressedObj = Objective.create(
+export const buttonPressedObj: ObjectiveInstance<string> = Objective.create(
     'button_pressed',
     'dummy',
     [
@@ -14,20 +14,20 @@ export const buttonPressedObj = Objective.create(
         }
     ]
 );
-export const myButtonPressed = buttonPressedObj('@s');
-export const allButtonPressed = buttonPressedObj('@a');
+export const myButtonPressed: Score<string> = buttonPressedObj('@s');
+export const allButtonPressed: Score<string> = buttonPressedObj('@a');
 
-const totalPlayersThatClearedLevel1Obj = Objective.create(
+const totalPlayersThatClearedLevel1Obj: ObjectiveInstance<string> = Objective.create(
     'limit_level1',
     'dummy'
 );
-export const totalPlayersThatClearedLevel1 = totalPlayersThatClearedLevel1Obj('player_cleared_lvl_1');
+export const totalPlayersThatClearedLevel1: Score<string> = totalPlayersThatClearedLevel1Obj('player_cleared_lvl_1');
 
 
 const tagLevel = clearedLevel1Tag;
 
 // setup
-export const setupLevel1 = MCFunction('levels/lvl1/setup', () => {
+export const setupLevel1: MCFunctionInstance<void> = MCFunction('levels/lvl1/setup', () => {
     gamemode('adventure', Selector('@a', {
         tag: ['!' + failedTag]
     }));
@@ -84,7 +84,7 @@ export const clearedLvl1 = () => {
 }
 
 // level 1 complition
-export const lvl1Complition = MCFunction('levels/lvl1/complition', async () => {
+export const lvl1Complition: MCFunctionInstance<Promise<void>> = MCFunction('levels/lvl1/complition', async () => {
     scoreboard.objectives.remove('button_pressed');
 
     // elimination

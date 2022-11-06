@@ -1,6 +1,6 @@
-import { Predicate } from "sandstone";
+import { Predicate, PredicateInstance } from "sandstone";
 
-export const checkKey = Predicate('check_key', {
+export const checkKey: PredicateInstance = Predicate('check_key', {
 	"condition": "minecraft:entity_properties",
 	"entity": "this",
 	"predicate": {

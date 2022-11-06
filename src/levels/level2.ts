@@ -1,4 +1,4 @@
-import { clear, effect, execute, gamemode, give, MCFunction, Objective, playsound, Selector, sleep, tag, tellraw, title, tp, _ } from "sandstone";
+import { clear, effect, execute, gamemode, give, MCFunction, MCFunctionInstance, Objective, ObjectiveInstance, playsound, Score, Selector, sleep, tag, tellraw, title, tp, _ } from "sandstone";
 import { clearedLevel1Tag, clearedLevel2Tag, failedTag, tpLvl2 } from "../constants";
 import { failedFunction, self } from "../main";
 import { checkKey } from "../predicates";
@@ -7,18 +7,18 @@ import { setupLevel3 } from "./level3";
 // key command
 // /give @p tripwire_hook{display:{Name:'{"text":"Key","color":"gold","italic":false}'},CustomModelData:0001} 1
 
-const tagLevel = clearedLevel2Tag;
-const previousLevel = clearedLevel1Tag;
+const tagLevel: string = clearedLevel2Tag;
+const previousLevel: string = clearedLevel1Tag;
 
 // neccessary vars
-const totalPlayersThatClearedLevel2Obj = Objective.create(
+const totalPlayersThatClearedLevel2Obj: ObjectiveInstance<string> = Objective.create(
     'limit_level2',
     'dummy'
 );
-export const totalPlayersThatClearedLevel2 = totalPlayersThatClearedLevel2Obj('player_cleared_lvl_2');
+export const totalPlayersThatClearedLevel2: Score<string> = totalPlayersThatClearedLevel2Obj('player_cleared_lvl_2');
 
 // setup
-export const setupLevel2 = MCFunction('levels/lvl2/setup', () => {
+export const setupLevel2: MCFunctionInstance<void> = MCFunction('levels/lvl2/setup', () => {
     gamemode('adventure', Selector('@a', {
         tag: [previousLevel, '!' + failedTag]
     }));
@@ -74,7 +74,7 @@ export const clearedLvl2 = () => {
 }
 
 // level 2 complition
-export const lvl2Complition = MCFunction('levels/lvl2/complition', async () => {
+export const lvl2Complition: MCFunctionInstance<Promise<void>> = MCFunction('levels/lvl2/complition', async () => {
 
     // elimination
     failedFunction(tagLevel);
