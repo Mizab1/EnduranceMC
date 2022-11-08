@@ -1,5 +1,5 @@
-import { effect, execute, gamemode, MCFunction, MCFunctionInstance, Objective, ObjectiveInstance, playsound, rel, Score, Selector, sleep, tag, tellraw, title, tp, _ } from "sandstone";
-import { clearedLevel2Tag, clearedLevel3Tag, failedTag, tpLvl3 } from "../constants";
+import { effect, execute, gamemode, MCFunction, MCFunctionInstance, Objective, ObjectiveInstance, playsound, rel, say, Score, Selector, sleep, tag, tellraw, title, tp, _ } from "sandstone";
+import { clearedLevel2Tag, clearedLevel3Tag, failedTag, infoLvl3 } from "../constants";
 import { failedFunction, self } from "../main";
 import { setupLevel4 } from "./level4";
 
@@ -20,8 +20,8 @@ export const setupLevel3: MCFunctionInstance<void> = MCFunction('levels/lvl3/set
     }));
 
 
-    tp('@a', tpLvl3, ["90", "0"]);
-    playsound('minecraft:block.note_block.chime', 'master', '@a', tpLvl3, 1, 0.5);
+    tp('@a', infoLvl3.tp, infoLvl3.facing);
+    playsound('minecraft:block.note_block.chime', 'master', '@a', infoLvl3.tp, 1, 0.5);
     tellraw(Selector('@a', { gamemode: '!spectator' }),
         [
             {
@@ -34,7 +34,7 @@ export const setupLevel3: MCFunctionInstance<void> = MCFunction('levels/lvl3/set
                 text: "Here you have jump and reach the end of the parkour.\n",
                 color: "gold"
             }, {
-                text: "If you fall, your progress will be reset. \n",
+                text: "If you fall, your progress will reset. \n",
                 color: "gold"
             }, {
                 text: "The one who fail to finish will be eliminated. \n",
@@ -48,10 +48,10 @@ export const setupLevel3: MCFunctionInstance<void> = MCFunction('levels/lvl3/set
 })
 
 // detect fall
-export const detectFall: MCFunctionInstance<void> = MCFunction('detect_fall', () => {
+export const detectFall: MCFunctionInstance<void> = MCFunction('levels/lvl3/detect_fall', () => {
     execute.as('@a').at(self).if(_.block(rel(0, -0.35, 0), 'minecraft:red_stained_glass')).run(() => {
         tellraw(self, [{
-            text: "==========================\n",
+            text: "\n==========================\n",
             color: "gray"
         }, {
             text: "You fell :(\n",
@@ -60,7 +60,7 @@ export const detectFall: MCFunctionInstance<void> = MCFunction('detect_fall', ()
             text: "==========================\n",
             color: "gray"
         }]);
-        tp(self, tpLvl3, ['90', '0']);
+        tp(self, infoLvl3.tp, infoLvl3.facing);
         playsound('minecraft:block.note_block.didgeridoo', 'master', self, rel(0, 0, 0), 2);
     })
 })
@@ -68,14 +68,8 @@ export const detectFall: MCFunctionInstance<void> = MCFunction('detect_fall', ()
 // player cleared the level
 export const clearedLvl3 = () => {
     execute.as(Selector('@a', { gamemode: "!spectator" })).at(self).run(() => {
-        _.if(_.and(_.block(rel(0, -0.35, 0), 'minecraft:polished_granite'), Selector('@s', { tag: '!' + tagLevel })), () => {
-            playsound('minecraft:block.note_block.chime', 'master', self)
-            gamemode('spectator', self);
-            tag(self).add(tagLevel);
-            title(self).title([{ text: "Level 3 Cleared!", color: "gold" }]);
-            title(self).subtitle([{ text: "Good Job!", color: "gold" }]);
-
-            totalPlayersThatClearedLevel3.add(1)
+        _.if(_.and(Selector('@s', { x: -227, y: 97, z:262, dx:-4, dy:2, dz: -24}), Selector('@s', { tag: '!' + tagLevel })), () => {
+            say('hi')
         })
     })
 }
@@ -98,4 +92,8 @@ export const lvl3Complition: MCFunctionInstance<Promise<void>> = MCFunction('lev
     })
     effect.give('@a', 'minecraft:blindness', 3, 0, true);
     setupLevel4();
+})
+
+MCFunction('levels/lvl3/force_next_lvl', () => {
+    lvl3Complition();
 })

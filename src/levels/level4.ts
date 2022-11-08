@@ -1,9 +1,10 @@
-import { abs, effect, execute, gamemode, MCFunction, MCFunctionInstance, Objective, ObjectiveInstance, playsound, rel, Score, Selector, setblock, sleep, tag, tellraw, title, tp, _ } from "sandstone";
-import { clearedLevel3Tag, clearedLevel4Tag, failedTag, tpLvl4 } from "../constants";
+import { abs, bossbar, effect, execute, gamemode, MCFunction, MCFunctionInstance, Objective, ObjectiveInstance, playsound, rel, Score, Selector, setblock, sleep, tag, tellraw, title, tp, _ } from "sandstone";
+import { clearedLevel3Tag, clearedLevel4Tag, failedTag, infoLvl4, tpLvl4 } from "../constants";
 import { failedFunction, self } from "../main";
 
-const tagLevel: string = clearedLevel4Tag;
 const previousLevel: string = clearedLevel3Tag;
+const bossbarName: string = 'timer_lvl_4'
+const maxTime: number = 5;
 
 // neccessary vars
 const totalPlayersThatClearedLevel4Obj: ObjectiveInstance<string> = Objective.create(
@@ -18,9 +19,8 @@ export const setupLevel4: MCFunctionInstance<void> = MCFunction('levels/lvl4/set
         tag: [previousLevel, '!' + failedTag]
     }));
 
-
-    tp('@a', tpLvl4, ["90", "0"]);
-    playsound('minecraft:block.note_block.chime', 'master', '@a', tpLvl4, 1, 0.5);
+    tp('@a', infoLvl4.tp, infoLvl4.facing);
+    playsound('minecraft:block.note_block.chime', 'master', '@a', infoLvl4.tp, 1, 0.5);
     tellraw(Selector('@a', { gamemode: '!spectator' }),
         [
             {
@@ -30,45 +30,40 @@ export const setupLevel4: MCFunctionInstance<void> = MCFunction('levels/lvl4/set
                 text: "This is third level of the game. \n",
                 color: "gold"
             }, {
-                text: "Here you have jump and reach the end of the parkour.\n",
+                text: "You have to craft as many item as you can.\n",
                 color: "gold"
             }, {
-                text: "If you fall, your progress will be reset. \n",
+                text: "After the timer ends your items will be evaluated. \n",
                 color: "gold"
             }, {
-                text: "The one who fail to finish will be eliminated. \n",
+                text: "The person with the least items will fail. \n",
                 color: "gold"
             }, {
                 text: "========================================\n",
                 color: "gray"
             }
-        ]);
+        ]
+    );
+    
+    // bossbar 
+    bossbar.add(bossbarName , [{
+        text: 'Timer for level 4',
+        color: 'red'
+    }]);
+    bossbar.set(bossbarName).players('@a');
+    bossbar.set(bossbarName).max(maxTime);
+    bossbar.set(bossbarName).value(maxTime);
+    bossbar.set(bossbarName).color('red');
+    bossbar.set(bossbarName).style('notched_20');
+    startTimer();
 
 })
-
-// player cleared the level
-export const clearedLvl4 = () => {
-    execute.as(Selector('@a', { gamemode: "!spectator" })).at(self).run(() => {
-        _.if(_.and(_.block(rel(0, -0.35, 0), 'minecraft:polished_granite'), Selector('@s', { tag: '!' + tagLevel })), () => {
-            playsound('minecraft:block.note_block.chime', 'master', self)
-            gamemode('spectator', self);
-            tag(self).add(tagLevel);
-            title(self).title([{ text: "Level 4 Cleared!", color: "gold" }]);
-            title(self).subtitle([{ text: "Good Job!", color: "gold" }]);
-
-            totalPlayersThatClearedLevel4.add(1)
-        })
-    })
-}
 
 // level 4 complition
 export const lvl4Complition: MCFunctionInstance<Promise<void>> = MCFunction('levels/lvl4/complition', async () => {
 
-    // elimination
-    failedFunction(tagLevel);
-
     await sleep('10t');
-    execute.as(Selector('@a', { tag: [tagLevel, '!' + failedTag] })).at(self).run(() => {
+    execute.as(Selector('@a', { tag: ['!' + failedTag] })).at(self).run(() => {
         title(self).title([
             {
                 text: "You cleared Level 4!",
@@ -80,8 +75,14 @@ export const lvl4Complition: MCFunctionInstance<Promise<void>> = MCFunction('lev
     effect.give('@a', 'minecraft:blindness', 3, 0, true);
 })
 
-// timer init
-MCFunction('levels/lvl4/timer_init', () => {
-    setblock(abs(132, 22, 116), 'minecraft:redstone_block');
-    setblock(abs(132, 22, 116), 'minecraft:air');
+export const getBossbarName = () => bossbarName;
+
+// timer
+export const startTimer: MCFunctionInstance<Promise<void>> = MCFunction('levels/lvl4/start_timer', async () => {
+    for(let i = maxTime; i >= 0; i--){
+        await sleep('1s');
+        bossbar.set(bossbarName).value(i);
+        if(i == 0)
+            bossbar.remove(bossbarName);
+    }
 })

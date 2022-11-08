@@ -1,5 +1,5 @@
-import { clear, effect, execute, gamemode, give, MCFunction, MCFunctionInstance, Objective, ObjectiveInstance, playsound, Score, Selector, sleep, tag, tellraw, title, tp, _ } from "sandstone";
-import { clearedLevel1Tag, clearedLevel2Tag, failedTag, tpLvl2 } from "../constants";
+import { clear, effect, execute, gamemode, give, MCFunction, MCFunctionInstance, Objective, ObjectiveInstance, playsound, Score, Selector, sleep, spawnpoint, tag, tellraw, title, tp, _ } from "sandstone";
+import { clearedLevel1Tag, clearedLevel2Tag, failedTag, infoLvl2 } from "../constants";
 import { failedFunction, self } from "../main";
 import { checkKey } from "../predicates";
 import { setupLevel3 } from "./level3";
@@ -19,16 +19,17 @@ export const totalPlayersThatClearedLevel2: Score<string> = totalPlayersThatClea
 
 // setup
 export const setupLevel2: MCFunctionInstance<void> = MCFunction('levels/lvl2/setup', () => {
-    gamemode('adventure', Selector('@a', {
+    gamemode('survival', Selector('@a', {
         tag: [previousLevel, '!' + failedTag]
     }));
 
     give(Selector('@a', {
         gamemode: '!spectator'
-    }), 'minecraft:diamond_pickaxe' + `{CanDestroy:["minecraft:cobbled_deepslate"],display:{Name:'{"text":"Super Pickaxe","color":"gold","italic":false}'},CustomModelData:0011,Enchantments:[{id:"minecraft:efficiency",lvl:10s}]}`, 1)
+    }), 'minecraft:diamond_pickaxe' + `{display:{Name:'{"text":"Super Pickaxe","color":"gold","italic":false}'},CustomModelData:0011,Enchantments:[{id:"minecraft:efficiency",lvl:10s}]}`, 1)
 
-    tp('@a', tpLvl2, ["-120", "0"]);
-    playsound('minecraft:block.note_block.chime', 'master', '@a', tpLvl2, 1, 0.5);
+    tp('@a', infoLvl2.tp, infoLvl2.facing);
+    spawnpoint('@a', infoLvl2.tp);
+    playsound('minecraft:block.note_block.chime', 'master', '@a', infoLvl2.tp, 1, 0.5);
     tellraw(Selector('@a', { gamemode: '!spectator' }),
         [
             {
@@ -41,7 +42,7 @@ export const setupLevel2: MCFunctionInstance<void> = MCFunction('levels/lvl2/set
                 text: "Here you have find the key that is \nscattered all around the map in a chest.\n",
                 color: "gold"
             }, {
-                text: "There are 8 chests, 5 on top and 3 underground. \n",
+                text: "There are 8 chests \n",
                 color: "gold"
             }, {
                 text: "The one who fail to find the key will be eliminated. \n",
@@ -54,13 +55,11 @@ export const setupLevel2: MCFunctionInstance<void> = MCFunction('levels/lvl2/set
 
 })
 
-// TODO make a machanism for checking the key
+
 // player cleared the level
 export const clearedLvl2 = () => {
     execute.as(Selector('@a', { gamemode: "!spectator" })).at(self).run(() => {
-        _.if(_.and(Selector('@s', {
-            predicate: checkKey
-        }), Selector('@s', { tag: '!' + tagLevel })), () => {
+        _.if(_.and(Selector('@s', { predicate: checkKey }), Selector('@s', { tag: '!' + tagLevel })), () => {
             clear(self, 'minecraft:tripwire_hook');
             playsound('minecraft:block.note_block.chime', 'master', self)
             gamemode('spectator', self);
@@ -92,4 +91,8 @@ export const lvl2Complition: MCFunctionInstance<Promise<void>> = MCFunction('lev
     })
     effect.give('@a', 'minecraft:blindness', 3, 0, true);
     setupLevel3();
+})
+
+MCFunction('levels/lvl2/force_next_lvl', () => {
+    lvl2Complition();
 })

@@ -1,8 +1,9 @@
-import { effect, execute, gamemode, gamerule, MCFunction, say, Selector, SelectorClass, sleep, tag, title, tp, _ } from "sandstone";
-import { failedTag, hubCoord, noOfPlayer } from "./constants";
-import { clearedLvl1, lvl1Complition, setupLevel1, totalPlayersThatClearedLevel1 } from "./levels/level1";
-import { clearedLvl2, lvl2Complition, totalPlayersThatClearedLevel2 } from "./levels/level2";
+import { bossbar, effect, execute, gamemode, gamerule, MCFunction, Selector, SelectorClass, spawnpoint, tag, title, _ } from "sandstone";
+import { failedTag, ForcedFailedAtLvl4, hubCoord, noOfPlayer } from "./constants";
+import { clearedLvl1, lvl1Complition, totalPlayersThatClearedLevel1 } from "./levels/level1";
+import { lvl2Complition, totalPlayersThatClearedLevel2 } from "./levels/level2";
 import { clearedLvl3, detectFall, lvl3Complition, totalPlayersThatClearedLevel3 } from "./levels/level3";
+import { getBossbarName, lvl4Complition } from "./levels/level4";
 
 // variables 
 
@@ -12,7 +13,9 @@ export const self: SelectorClass<true, true> = Selector('@s');
 // functions
 export const failedFunction = (tagName) => {
     execute.as(Selector('@a', {
-        tag: ['!' + tagName, '!' + failedTag]
+        tag: ['!' + tagName, '!' + failedTag],
+        limit: 1,
+        sort: 'random'
     })).run(() => {
         tag(self).add(failedTag)
         gamemode('spectator', self);
@@ -30,6 +33,8 @@ MCFunction('load', () => {
     gamerule('doWeatherCycle', false)
     gamerule('sendCommandFeedback', false);
 
+    // spawnpoint to lobby
+    spawnpoint('@a', hubCoord);
     
 }, {
     runOnLoad: true
@@ -52,7 +57,7 @@ MCFunction('tick', () => {
     })
 
     //level 2
-    clearedLvl2();
+    // clearedLvl2();
     _.if(totalPlayersThatClearedLevel2.matches([(noOfPlayer - 2), null]), () => {
         totalPlayersThatClearedLevel2.set(0);
         lvl2Complition();
@@ -65,14 +70,20 @@ MCFunction('tick', () => {
         totalPlayersThatClearedLevel3.set(0);
         lvl3Complition();
     })
+
+    //level 4
+    execute.as('@a').at(self).if(Selector('@s', { tag: ForcedFailedAtLvl4})).run(() => {
+        bossbar.remove(getBossbarName());
+        tag(self).remove(ForcedFailedAtLvl4);
+        tag(self).add(failedTag)
+        gamemode('spectator', self);
+        title(self).title([{
+            text: "You Failed",
+            color: 'red'
+        }])
+
+        lvl4Complition();
+    })
 }, {
     runEachTick: true
-})
-
-// hub button
-MCFunction('hub_button', () => {
-    setupLevel1();
-})
-MCFunction('tp_to_hub', () => {
-    tp('@a', hubCoord, ['0', '0'])
 })
