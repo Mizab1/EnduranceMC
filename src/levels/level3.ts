@@ -69,7 +69,13 @@ export const detectFall: MCFunctionInstance<void> = MCFunction('levels/lvl3/dete
 export const clearedLvl3 = () => {
     execute.as(Selector('@a', { gamemode: "!spectator" })).at(self).run(() => {
         _.if(_.and(Selector('@s', { x: -227, y: 97, z:262, dx:-4, dy:2, dz: -24}), Selector('@s', { tag: '!' + tagLevel })), () => {
-            say('hi')
+            playsound('minecraft:block.note_block.chime', 'master', self)
+            gamemode('spectator', self);
+            tag(self).add(tagLevel);
+            title(self).title([{ text: "Level 3 Cleared!", color: "gold" }]);
+            title(self).subtitle([{ text: "Good Job!", color: "gold" }]);
+
+            totalPlayersThatClearedLevel3.add(1)
         })
     })
 }

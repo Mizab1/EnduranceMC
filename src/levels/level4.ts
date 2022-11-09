@@ -1,4 +1,4 @@
-import { abs, bossbar, effect, execute, gamemode, MCFunction, MCFunctionInstance, Objective, ObjectiveInstance, playsound, rel, Score, Selector, setblock, sleep, tag, tellraw, title, tp, _ } from "sandstone";
+import { abs, bossbar, clear, effect, execute, gamemode, MCFunction, MCFunctionInstance, Objective, ObjectiveInstance, playsound, rel, Score, Selector, setblock, sleep, tag, tellraw, title, tp, _ } from "sandstone";
 import { clearedLevel3Tag, clearedLevel4Tag, failedTag, infoLvl4, tpLvl4 } from "../constants";
 import { failedFunction, self } from "../main";
 
@@ -82,7 +82,24 @@ export const startTimer: MCFunctionInstance<Promise<void>> = MCFunction('levels/
     for(let i = maxTime; i >= 0; i--){
         await sleep('1s');
         bossbar.set(bossbarName).value(i);
-        if(i == 0)
+        if(i == 0){
             bossbar.remove(bossbarName);
+            tellraw(Selector('@a', { tag: `!${failedTag}`}), [
+                {
+                    text: "========================================\n",
+                    color: "gray"
+                }, {
+                    text: "Now you must stop crafting and moving\n",
+                    color: 'green'
+                }, {
+                    text: "Your crafted item will be evaluated by the moderator\n",
+                    color: 'green'
+                }, {
+                    text: "========================================\n",
+                    color: "gray"
+                }
+            ]);
+            clear('@a');
+        }
     }
 })
