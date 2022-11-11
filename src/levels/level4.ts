@@ -1,25 +1,30 @@
-import { abs, bossbar, clear, effect, execute, gamemode, MCFunction, MCFunctionInstance, Objective, ObjectiveInstance, playsound, rel, Score, Selector, setblock, sleep, tag, tellraw, title, tp, _ } from "sandstone";
-import { clearedLevel3Tag, clearedLevel4Tag, failedTag, infoLvl4, tpLvl4 } from "../constants";
-import { failedFunction, self } from "../main";
+import { bossbar, clear, effect, execute, gamemode, MCFunction, MCFunctionInstance, Objective, playsound, Selector, sleep, spawnpoint, tellraw, title, tp, _ } from "sandstone";
+import { clearedLevel3Tag, failedTag, infoLvl4 } from "../constants";
+import { self } from "../main";
+import { setupLevel5 } from "./level5";
 
 const previousLevel: string = clearedLevel3Tag;
 const bossbarName: string = 'timer_lvl_4'
-const maxTime: number = 5;
+const maxTime: number = 10;
 
 // neccessary vars
-const totalPlayersThatClearedLevel4Obj: ObjectiveInstance<string> = Objective.create(
-    'limit_level4',
-    'dummy'
-);
-export const totalPlayersThatClearedLevel4: Score<string> = totalPlayersThatClearedLevel4Obj('player_cleared_lvl_4');
+// const totalPlayersThatClearedLevel4Obj: ObjectiveInstance<string> = Objective.create(
+//     'limit_level4',
+//     'dummy'
+// );
+// export const totalPlayersThatClearedLevel4: Score<string> = totalPlayersThatClearedLevel4Obj('player_cleared_lvl_4');
+const isPlayingLevel4Obj = Objective.create('is_playing_lvl_4', 'dummy');
+const isPlayingLevel4 = isPlayingLevel4Obj('status');
 
 // setup
 export const setupLevel4: MCFunctionInstance<void> = MCFunction('levels/lvl4/setup', () => {
-    gamemode('adventure', Selector('@a', {
-        tag: [previousLevel, '!' + failedTag]
+    isPlayingLevel4.set(1);
+    gamemode('survival', Selector('@a', {
+        tag: ['!' + failedTag]
     }));
 
     tp('@a', infoLvl4.tp, infoLvl4.facing);
+    spawnpoint('@a', infoLvl4.tp);
     playsound('minecraft:block.note_block.chime', 'master', '@a', infoLvl4.tp, 1, 0.5);
     tellraw(Selector('@a', { gamemode: '!spectator' }),
         [
@@ -73,6 +78,7 @@ export const lvl4Complition: MCFunctionInstance<Promise<void>> = MCFunction('lev
         playsound('minecraft:ui.toast.challenge_complete', 'master', self)
     })
     effect.give('@a', 'minecraft:blindness', 3, 0, true);
+    setupLevel5();
 })
 
 export const getBossbarName = () => bossbarName;
@@ -84,22 +90,25 @@ export const startTimer: MCFunctionInstance<Promise<void>> = MCFunction('levels/
         bossbar.set(bossbarName).value(i);
         if(i == 0){
             bossbar.remove(bossbarName);
-            tellraw(Selector('@a', { tag: `!${failedTag}`}), [
-                {
-                    text: "========================================\n",
-                    color: "gray"
-                }, {
-                    text: "Now you must stop crafting and moving\n",
-                    color: 'green'
-                }, {
-                    text: "Your crafted item will be evaluated by the moderator\n",
-                    color: 'green'
-                }, {
-                    text: "========================================\n",
-                    color: "gray"
-                }
-            ]);
-            clear('@a');
+            _.if(isPlayingLevel4.matches(1), () => {
+                tellraw(Selector('@a', { tag: `!${failedTag}`}), [
+                    {
+                        text: "========================================\n",
+                        color: "gray"
+                    }, {
+                        text: "Now you must stop crafting and moving\n",
+                        color: 'green'
+                    }, {
+                        text: "Your crafted item will be evaluated by the moderator\n",
+                        color: 'green'
+                    }, {
+                        text: "========================================\n",
+                        color: "gray"
+                    }
+                ]);
+                clear('@a');
+                isPlayingLevel4.set(0);
+            })
         }
     }
 })

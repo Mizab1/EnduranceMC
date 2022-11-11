@@ -1,4 +1,4 @@
-import { effect, execute, gamemode, MCFunction, MCFunctionInstance, Objective, ObjectiveInstance, playsound, Score, scoreboard, Selector, sleep, spawnpoint, tag, tellraw, title, tp, _ } from "sandstone";
+import { effect, execute, gamemode, MCFunction, MCFunctionInstance, Objective, ObjectiveInstance, playsound, Score, Selector, sleep, spawnpoint, tag, tellraw, title, tp, _ } from "sandstone";
 import { clearedLevel1Tag, failedTag, infoLvl1 } from "../constants";
 import { failedFunction, self } from "../main";
 import { setupLevel2 } from "./level2";

@@ -1,4 +1,4 @@
-import { effect, execute, gamemode, MCFunction, MCFunctionInstance, Objective, ObjectiveInstance, playsound, rel, say, Score, Selector, sleep, tag, tellraw, title, tp, _ } from "sandstone";
+import { effect, execute, gamemode, MCFunction, MCFunctionInstance, Objective, ObjectiveInstance, playsound, rel, Score, Selector, sleep, spawnpoint, tag, tellraw, title, tp, _ } from "sandstone";
 import { clearedLevel2Tag, clearedLevel3Tag, failedTag, infoLvl3 } from "../constants";
 import { failedFunction, self } from "../main";
 import { setupLevel4 } from "./level4";
@@ -16,11 +16,12 @@ export const totalPlayersThatClearedLevel3: Score<string> = totalPlayersThatClea
 // setup
 export const setupLevel3: MCFunctionInstance<void> = MCFunction('levels/lvl3/setup', () => {
     gamemode('adventure', Selector('@a', {
-        tag: [previousLevel, '!' + failedTag]
+        tag: ['!' + failedTag]
     }));
 
 
     tp('@a', infoLvl3.tp, infoLvl3.facing);
+    spawnpoint('@a', infoLvl3.tp);
     playsound('minecraft:block.note_block.chime', 'master', '@a', infoLvl3.tp, 1, 0.5);
     tellraw(Selector('@a', { gamemode: '!spectator' }),
         [
@@ -48,7 +49,7 @@ export const setupLevel3: MCFunctionInstance<void> = MCFunction('levels/lvl3/set
 })
 
 // detect fall
-export const detectFall: MCFunctionInstance<void> = MCFunction('levels/lvl3/detect_fall', () => {
+export const detectFallLvl3: MCFunctionInstance<void> = MCFunction('levels/lvl3/detect_fall', () => {
     execute.as('@a').at(self).if(_.block(rel(0, -0.35, 0), 'minecraft:red_stained_glass')).run(() => {
         tellraw(self, [{
             text: "\n==========================\n",

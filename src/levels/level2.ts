@@ -20,7 +20,7 @@ export const totalPlayersThatClearedLevel2: Score<string> = totalPlayersThatClea
 // setup
 export const setupLevel2: MCFunctionInstance<void> = MCFunction('levels/lvl2/setup', () => {
     gamemode('survival', Selector('@a', {
-        tag: [previousLevel, '!' + failedTag]
+        tag: ['!' + failedTag]
     }));
 
     give(Selector('@a', {

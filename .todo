@@ -1,0 +1,8 @@
+- winner should get a msg when used book to clear the level forcefully
+- chnage the gamemode
+- clean the book, other tag all has clickEvent
+- level 4 msg is displaying multiple times
+
+* Edit time for bossbar
+* Edit the time for block breaking
+* Edit the time for worldborder

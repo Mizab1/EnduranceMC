@@ -12,3 +12,13 @@ export const checkKey: PredicateInstance = Predicate('check_key', {
 		}
 	}
 })
+
+export const isSneaking: PredicateInstance = Predicate('is_sneaking', {
+	"condition": "minecraft:entity_properties",
+	"entity": "this",
+	"predicate": {
+		"flags": {
+			"is_sneaking": true
+		}
+	}  	  
+})
