@@ -1,8 +1,9 @@
-import { functionCmd, MCFunction, raw, scoreboard, tag } from "sandstone";
+import { bossbar, functionCmd, MCFunction, raw, scoreboard, tag } from "sandstone";
 import { clearedLevel1Tag, clearedLevel2Tag, clearedLevel3Tag, clearedLevel4Tag, clearedLevel6Tag, failedTag, ForcedFailedAtLvl4, ForcedFailedAtLvl5, ForcedFailedAtLvl6, ForcedFailedAtLvl7, winner } from "./constants";
 import { totalPlayersThatClearedLevel1 } from "./levels/level1";
 import { totalPlayersThatClearedLevel2 } from "./levels/level2";
 import { totalPlayersThatClearedLevel3 } from "./levels/level3";
+import { bossbarName } from "./levels/level4";
 import { isPlayingLevel7, resetWorldBorder } from "./levels/level7";
 
 // remove scores
@@ -15,7 +16,7 @@ MCFunction('uninstall/remove_scores', () => {
     resetWorldBorder();
     raw(`function cn:cn/reset`);
     functionCmd('levels/lvl5/reset');
-    functionCmd('levels/lvl7/reset_worldborder');
+    bossbar.remove(bossbarName);
 })
 
 // remove tag

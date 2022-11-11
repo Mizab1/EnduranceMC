@@ -4,7 +4,7 @@ import { self } from "../main";
 import { setupLevel5 } from "./level5";
 
 const previousLevel: string = clearedLevel3Tag;
-const bossbarName: string = 'timer_lvl_4'
+export const bossbarName: string = 'timer_lvl_4'
 const maxTime: number = 180;
 
 // neccessary vars
