@@ -45,7 +45,7 @@ export const setupLevel7: MCFunctionInstance<void> = MCFunction('levels/lvl7/set
 
     // edit worldborder
     raw(`worldborder center ${infoLvl7.worldBorder}`);
-    worldborder.set(30, 20);
+    worldborder.set(30, 300);
     worldborder.damageAmount(50);
     worldborder.damageBuffer(0);
 })
@@ -70,5 +70,5 @@ export const lvl7Complition: MCFunctionInstance<Promise<void>> = MCFunction('lev
 })
 
 export const resetWorldBorder: MCFunctionInstance<void> = MCFunction('levels/lvl7/reset_worldborder', () => {
-    worldborder.set(999999);
+    worldborder.set(3000);
 })
