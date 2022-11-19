@@ -1,5 +1,5 @@
 import { effect, execute, gamemode, MCFunction, MCFunctionInstance, Objective, playsound, raw, Selector, sleep, spawnpoint, tellraw, title, tp, worldborder } from "sandstone";
-import { clearedLevel6Tag, failedTag, infoLvl6, infoLvl7, winner } from "../constants";
+import { clearedLevel6Tag, excluded, failedTag, infoLvl6, infoLvl7, winner } from "../constants";
 import { self } from "../main";
 
 const isPlayingLevel7Obj = Objective.create('is_playing_lvl_7', 'dummy');
@@ -17,11 +17,11 @@ const previousLevel: string = clearedLevel6Tag;
 // setup
 export const setupLevel7: MCFunctionInstance<void> = MCFunction('levels/lvl7/setup', () => {
     gamemode('survival', Selector('@a', {
-        tag: ['!' + failedTag]
+        tag: ['!' + failedTag, `!${excluded}`]
     }));
 
 
-    tp('@a', infoLvl7.tp, infoLvl7.facing);
+    tp(Selector('@a', { tag: `!${excluded}` }), infoLvl7.tp, infoLvl7.facing);
     spawnpoint('@a', infoLvl7.tp);
     playsound('minecraft:block.note_block.chime', 'master', '@a', infoLvl6.tp, 1, 0.5);
     tellraw(Selector('@a', { gamemode: '!spectator' }),
@@ -45,7 +45,8 @@ export const setupLevel7: MCFunctionInstance<void> = MCFunction('levels/lvl7/set
 
     // edit worldborder
     raw(`worldborder center ${infoLvl7.worldBorder}`);
-    worldborder.set(30, 300);
+    worldborder.set(500);
+    worldborder.set(30, 20);
     worldborder.damageAmount(50);
     worldborder.damageBuffer(0);
 })
@@ -54,7 +55,7 @@ export const setupLevel7: MCFunctionInstance<void> = MCFunction('levels/lvl7/set
 export const lvl7Complition: MCFunctionInstance<Promise<void>> = MCFunction('levels/lvl7/complition', async () => {
 
     await sleep('10t');
-    execute.as(Selector('@a', { tag: [winner] })).at(self).run(() => {
+    execute.as(Selector('@a', { tag: [winner, `!${excluded}`] })).at(self).run(() => {
         title(self).title([
             {
                 text: "You cleared all levels!",
@@ -66,9 +67,9 @@ export const lvl7Complition: MCFunctionInstance<Promise<void>> = MCFunction('lev
         raw(`summon firework_rocket ~1 ~ ~ {LifeTime:10,FireworksItem:{id:firework_rocket,Count:1,tag:{Fireworks:{Explosions:[{Type:1,Colors:[I;16746624,8287743]},{Type:0,Trail:1b,Colors:[I;14679872,16753451]},{Type:2,Flicker:1b,Colors:[I;4456703]}]}}}}`)
         raw(`summon firework_rocket ~-1 ~ ~ {LifeTime:10,FireworksItem:{id:firework_rocket,Count:1,tag:{Fireworks:{Explosions:[{Type:1,Colors:[I;16746624,8287743]},{Type:0,Trail:1b,Colors:[I;14679872,16753451]},{Type:2,Flicker:1b,Colors:[I;4456703]}]}}}}`)
     })
-    effect.give('@a', 'minecraft:blindness', 3, 0, true);
+    effect.give(Selector('@a', { tag: `!${excluded}` }), 'minecraft:blindness', 3, 0, true);
 })
 
 export const resetWorldBorder: MCFunctionInstance<void> = MCFunction('levels/lvl7/reset_worldborder', () => {
-    worldborder.set(3000);
+    worldborder.set(6000);
 })

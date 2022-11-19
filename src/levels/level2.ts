@@ -1,5 +1,5 @@
-import { clear, effect, execute, gamemode, give, MCFunction, MCFunctionInstance, Objective, ObjectiveInstance, playsound, Score, Selector, sleep, spawnpoint, tag, tellraw, title, tp, _ } from "sandstone";
-import { clearedLevel1Tag, clearedLevel2Tag, failedTag, infoLvl2 } from "../constants";
+import { clear, effect, execute, gamemode, give, kill, MCFunction, MCFunctionInstance, NBT, Objective, ObjectiveInstance, playsound, rel, Score, Selector, sleep, spawnpoint, summon, tag, tellraw, title, tp, _ } from "sandstone";
+import { chest1, chest2, chest3, chest4, chest5, chest6, chest7, chest8, clearedLevel1Tag, clearedLevel2Tag, excluded, failedTag, infoLvl2 } from "../constants";
 import { failedFunction, self } from "../main";
 import { checkKey } from "../predicates";
 import { setupLevel3 } from "./level3";
@@ -20,14 +20,15 @@ export const totalPlayersThatClearedLevel2: Score<string> = totalPlayersThatClea
 // setup
 export const setupLevel2: MCFunctionInstance<void> = MCFunction('levels/lvl2/setup', () => {
     gamemode('survival', Selector('@a', {
-        tag: ['!' + failedTag]
+        tag: ['!' + failedTag, `!${excluded}`]
     }));
 
     give(Selector('@a', {
-        gamemode: '!spectator'
+        gamemode: '!spectator',
+        tag: `!${excluded}`
     }), 'minecraft:diamond_pickaxe' + `{display:{Name:'{"text":"Super Pickaxe","color":"gold","italic":false}'},CustomModelData:0011,Enchantments:[{id:"minecraft:efficiency",lvl:10s}]}`, 1)
 
-    tp('@a', infoLvl2.tp, infoLvl2.facing);
+    tp(Selector('@a', {tag: `!${excluded}`}), infoLvl2.tp, infoLvl2.facing);
     spawnpoint('@a', infoLvl2.tp);
     playsound('minecraft:block.note_block.chime', 'master', '@a', infoLvl2.tp, 1, 0.5);
     tellraw(Selector('@a', { gamemode: '!spectator' }),
@@ -80,7 +81,7 @@ export const lvl2Complition: MCFunctionInstance<Promise<void>> = MCFunction('lev
 
     await sleep('10t');
     clear('@a', 'minecraft:diamond_pickaxe');
-    execute.as(Selector('@a', { tag: [tagLevel, '!' + failedTag] })).at(self).run(() => {
+    execute.as(Selector('@a', { tag: [tagLevel, '!' + failedTag, `!${excluded}`] })).at(self).run(() => {
         title(self).title([
             {
                 text: "You cleared Level 2!",
@@ -89,10 +90,31 @@ export const lvl2Complition: MCFunctionInstance<Promise<void>> = MCFunction('lev
         ]);
         playsound('minecraft:ui.toast.challenge_complete', 'master', self)
     })
-    effect.give('@a', 'minecraft:blindness', 3, 0, true);
+    effect.give(Selector('@a', {tag: `!${excluded}`}), 'minecraft:blindness', 3, 0, true);
     setupLevel3();
 })
 
 MCFunction('levels/lvl2/force_next_lvl', () => {
     lvl2Complition();
+})
+
+MCFunction('levels/lvl2/glow_chest', async () => {
+    const loc = [chest1, chest2, chest3, chest4, chest5, chest6, chest7, chest8];
+    const tag = 'glow_chest';
+
+    loc.forEach((value) => {
+        summon('minecraft:shulker', value, {
+            Glowing: NBT.byte(1),
+            NoAI: NBT.byte(1),
+            Tags: [tag],
+            ActiveEffects:[{
+                Id:14,
+                Amplifier:NBT.byte(1),
+                Duration:999999
+            }]
+        })
+    })
+
+    await sleep('2s')
+    tp(Selector('@e', { type:'minecraft:shulker', tag: tag }), rel(0, -600, 0))
 })

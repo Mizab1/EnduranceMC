@@ -1,4 +1,4 @@
-import { MCFunction, raw, tp } from "sandstone";
+import { MCFunction, raw, Selector, tellraw, title, tp } from "sandstone";
 import { hubCoord } from "./constants";
 import { setupLevel1 } from "./levels/level1";
 
@@ -19,17 +19,17 @@ MCFunction('give_book', () => {
                 },{
                     "text":"${NEWLINE}${NEWLINE}"
                 },{
-                    "text":"TP all player to${NEWLINE}level 1",
+                    "text":"  Send start message",
                     "color":"blue",
                     "underlined":false,
                     "clickEvent":{
                         "action":"run_command",
-                        "value":"/function endurance:tp_to_lvl_1"
+                        "value":"/function endurance:send_start_msg"
                     }
                 },{
                     "text":"${NEWLINE}${NEWLINE}"
                 },{
-                    "text":"1. Force clear ${NEWLINE}level 1 ",
+                    "text":"1. Force complete ${NEWLINE}level 1 ",
                     "color":"blue",
                     "underlined":false,
                     "clickEvent":{
@@ -39,7 +39,7 @@ MCFunction('give_book', () => {
                 },{
                     "text":"${NEWLINE}${NEWLINE}"
                 },{
-                    "text":"2. Force clear ${NEWLINE}level 2",
+                    "text":"2. Force complete ${NEWLINE}level 2",
                     "color":"blue",
                     "underlined":false,
                     "clickEvent":{
@@ -51,7 +51,7 @@ MCFunction('give_book', () => {
                 }
             ]','[
                 {
-                    "text":"3. Force clear level 3",
+                    "text":"3. Force complete level 3",
                     "color":"blue",
                     "clickEvent":{
                         "action":"run_command",
@@ -60,7 +60,7 @@ MCFunction('give_book', () => {
                 }
             ]','[
                 {
-                    "text":"To Clear level 4, type /tag [player name] add failed_at_4 ",
+                    "text":"To complete level 4, type: ${NEWLINE}/tag [player name] add failed_at_4 ",
                     "color":"blue",
                     "clickEvent":{
                         "action":"run_command",
@@ -69,7 +69,7 @@ MCFunction('give_book', () => {
                 },{
                     "text":"${NEWLINE}${NEWLINE}"
                 },{
-                    "text":"To Clear level 5, type /tag [player name] add failed_at_5",
+                    "text":"To complete level 5, type: ${NEWLINE}/tag [player name] add failed_at_5",
                     "color":"blue",
                     "clickEvent":{
                         "action":"run_command",
@@ -78,7 +78,7 @@ MCFunction('give_book', () => {
                 },{
                     "text":"${NEWLINE}${NEWLINE}"
                 },{
-                    "text":"To Clear level 6, type /tag [player name] add failed_at_6",
+                    "text":"To complete level 6, type: ${NEWLINE}/tag [player name] add failed_at_6",
                     "color":"blue",
                     "clickEvent":{
                         "action":"run_command",
@@ -87,8 +87,31 @@ MCFunction('give_book', () => {
                 }
             ]','[
                 {
-                    "text":"To Clear level 7, type /tag [player name] add won_tmp",
+                    "text":"To Clear level 7, type:${NEWLINE} /tag [player name] add won_tmp",
                     "color":"blue"
+                }
+            ]','[
+                {
+                    "text":"Glow chests in level 2${NEWLINE}${NEWLINE}",
+                    "color":"blue",
+                    "clickEvent":{
+                        "action":"run_command",
+                        "value":"/function endurance:levels/lvl2/glow_chest"
+                    }
+                }, {
+                    "text":"Lock chest in level 4${NEWLINE}${NEWLINE}",
+                    "color":"blue",
+                    "clickEvent":{
+                        "action":"run_command",
+                        "value":"/function endurance:levels/lvl4/lock_chest"
+                    }
+                }, {
+                    "text":"Key for chest in level 4",
+                    "color":"blue",
+                    "clickEvent":{
+                        "action":"run_command",
+                        "value":"/function endurance:levels/lvl4/give_key"
+                    }
                 }
             ]'
         ]
@@ -97,8 +120,13 @@ MCFunction('give_book', () => {
 })
 
 // tp to level 1 
-MCFunction('tp_to_lvl_1', () => {
-    setupLevel1();
+MCFunction('send_start_msg', () => {
+    tellraw(Selector('@a'), [
+        {
+            text: 'Stand on the golden platform to start the game',
+            color: 'gold'
+        }
+    ])
 })
 
 // tp to hub

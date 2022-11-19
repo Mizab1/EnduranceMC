@@ -1,8 +1,24 @@
-- winner should get a msg when used book to clear the level forcefully
-- chnage the gamemode
-- clean the book, other tag all has clickEvent
-- level 4 msg is displaying multiple times
+- winner should get a msg when used book to clear the level forcefully @done
+- chnage the gamemode @done
+- clean the book, other tag all has clickEvent @done
+- level 4 msg is displaying multiple times @done
 
-* Edit time for bossbar
-* Edit the time for block breaking
-* Edit the time for worldborder
+- Edit time for bossbar
+- Edit the time for block breaking
+- Edit the time for worldborder
+
+- 1) the new players spawn in the top of the lobby @done
+- 2) add a start system to the buttons clicker, detect when the players are in they platforms and lock the button, then add a regresive counter 3... 2... 1... and unlock the buttons @done
+- 3) add a tag to exclude manager and recorders like tag=noplayers (so they won't be players and won't count as players in the 10 main players) @done
+- 4) create a function where the manager in the book can glow up the chests few seconds to help the players find the chests @done
+
+- 1. setworldspawn bug, the players spawns in the ceiling @done
+- 2. glowing chests bugs in level 2 @done
+- 3. crafting platform with lock system to avoid the player do cheating when the timer is over, maybe just clear inventory @done
+- 4. for the level 5, the ladders @done
+-    - first remove the bridge @done
+-    - tp the players to each private ladder @done
+-    - if the player loses, he can't try again, is only one try so for the losers you can tp them back to the room but they can't keep trying or just give them spectator mode, but they didn't lost yet, remember that for this level, the winner will decide who is the loser @done
+-    - the sequence'd to be like: next level 5-tp every player in each bridge-do 3... 2... 1... title-and then remove the bridge- run the timer @done
+-    - do kill item for the ladders items @done
+- 5. change the coordinates to the built platform 

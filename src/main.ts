@@ -1,15 +1,18 @@
-import { bossbar, effect, execute, gamemode, gamerule, MCFunction, Objective, ObjectiveInstance, Score, Selector, SelectorClass, spawnpoint, tag, title, _ } from "sandstone";
+import { bossbar, effect, execute, gamemode, gamerule, give, MCFunction, Objective, ObjectiveArgument, ObjectiveClass, ObjectiveInstance, say, Score, Selector, SelectorClass, spawnpoint, tag, title, tp, _ } from "sandstone";
 import { ConditionType } from "sandstone/flow";
-import { failedTag, ForcedFailedAtLvl4, ForcedFailedAtLvl5, ForcedFailedAtLvl6, hubCoord, noOfPlayer, winner, winnerTmp } from "./constants";
-import { clearedLvl1, lvl1Complition, totalPlayersThatClearedLevel1 } from "./levels/level1";
+import { excluded, failedTag, ForcedFailedAtLvl4, ForcedFailedAtLvl5, ForcedFailedAtLvl6, hubCoord, infoLvl5, noOfPlayer, winner, winnerTmp } from "./constants";
+import { clearedLvl1, lvl1Complition, setupLevel1, totalPlayersThatClearedLevel1 } from "./levels/level1";
 import { clearedLvl2, lvl2Complition, totalPlayersThatClearedLevel2 } from "./levels/level2";
 import { clearedLvl3, detectFallLvl3, lvl3Complition, totalPlayersThatClearedLevel3 } from "./levels/level3";
 import { getBossbarName, lvl4Complition } from "./levels/level4";
-import { detectFallLevel5, detectSneakingLvl5, lvl5Complition } from "./levels/level5";
+import { detectFallLevel5, detectSneakingLvl5, isPlayingLevel5, lvl5Complition } from "./levels/level5";
 import { lvl6Complition } from "./levels/level6";
 import { isPlayingLevel7, lvl7Complition } from "./levels/level7";
 
 // variables 
+const PrivateObj = Objective.create('private_obj', 'dummy');
+const playerCount: Score<string> = PrivateObj('player_count');
+
 const PlayerDeathObj: ObjectiveInstance = Objective.create('death_count', 'deathCount');
 const playerDeath: Score<string> = PlayerDeathObj('@s');
 
@@ -24,7 +27,7 @@ export const self: SelectorClass<true, true> = Selector('@s');
 // functions
 export const failedFunction = (tagName) => {
     execute.as(Selector('@a', {
-        tag: ['!' + tagName, '!' + failedTag],
+        tag: ['!' + tagName, '!' + failedTag, `!${excluded}`],
         limit: 1,
         sort: 'random'
     })).run(() => {
@@ -61,11 +64,28 @@ MCFunction('load', () => {
 
 // //! TICK
 MCFunction('tick', () => {
+    // player count on the platform
+    execute.store.result.score('player_count', 'private_obj').run(() => {
+        execute.if(Selector('@a', {
+            tag: [ `!${failedTag}`, `!${excluded}` ],
+            x: 181,
+            y: 104,
+            z: 404,
+            dx: 27,
+            dy: 2,
+            dz: 10
+        }))
+    })
+    _.if(playerCount.matches(1), () => {
+        setupLevel1()
+    })
     //effects 
-    effect.give('@a', 'minecraft:night_vision', 999, 0, true);
-    effect.give('@a', 'minecraft:saturation', 999, 4, true);
-    effect.give('@a', 'minecraft:regeneration', 999, 3, true);
-    effect.give('@a', 'minecraft:resistance', 999, 3, true);
+    _.if(_.not(isPlayingLevel7.matches(1)), () => {
+        effect.give('@a', 'minecraft:night_vision', 15, 0, true);
+        effect.give('@a', 'minecraft:saturation', 15, 4, true);
+        effect.give('@a', 'minecraft:regeneration', 15, 3, true);
+        effect.give('@a', 'minecraft:resistance', 15, 3, true);
+    })
 
     // level 1 cleared
     clearedLvl1();
@@ -125,6 +145,13 @@ MCFunction('tick', () => {
 
         lvl5Complition();
     })
+    _.if(isPlayingLevel5.matches(1), () => {
+        execute.as('@a').at(self).if(playerDeathCondition).run(() => {
+            playerDeath.set(0);
+    
+            tp(Selector('@a', { tag: ['!' + failedTag, `!${excluded}`] }), infoLvl5.tp)
+        })
+    })
     
     //level 6
     execute.as('@a').at(self).if(Selector('@s', { tag: ForcedFailedAtLvl6})).run(() => {
@@ -159,11 +186,13 @@ MCFunction('tick', () => {
                 }
             ])
         })
-    }).else(() => {
-        execute.as('@a').at(self).if(playerDeathCondition).run(() => {
-            playerDeath.set(0);
-        })
     })
+    
+    execute.as('@a').at(self).if(playerDeathCondition).run(() => {
+        playerDeath.set(0);
+    })
+
+
     execute.as('@a').at(self).if(Selector('@s', { tag: winnerTmp})).run(() => {
         tag(self).remove(winnerTmp);
         tag(self).add(winner)

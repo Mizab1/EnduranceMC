@@ -1,11 +1,12 @@
-import { bossbar, clear, effect, execute, gamemode, MCFunction, MCFunctionInstance, Objective, playsound, Selector, sleep, spawnpoint, tellraw, title, tp, _ } from "sandstone";
-import { clearedLevel3Tag, failedTag, infoLvl4 } from "../constants";
+import { bossbar, clear, data, effect, execute, gamemode, give, MCFunction, MCFunctionInstance, Objective, playsound, Selector, sleep, spawnpoint, tellraw, title, tp, _ } from "sandstone";
+import { chest1, chest1Lvl4, chest2, chest2Lvl4, chest3, chest3Lvl4, chest4, chest5, chest5Lvl4, chest6Lvl4, chest7Lvl4, clearedLevel3Tag, excluded, failedTag, infoLvl4 } from "../constants";
 import { self } from "../main";
 import { setupLevel5 } from "./level5";
 
 const previousLevel: string = clearedLevel3Tag;
 export const bossbarName: string = 'timer_lvl_4'
 const maxTime: number = 180;
+export const chestCoord = [chest1Lvl4, chest2Lvl4, chest3Lvl4, chest5Lvl4, chest6Lvl4, chest7Lvl4];
 
 // neccessary vars
 // const totalPlayersThatClearedLevel4Obj: ObjectiveInstance<string> = Objective.create(
@@ -14,16 +15,16 @@ const maxTime: number = 180;
 // );
 // export const totalPlayersThatClearedLevel4: Score<string> = totalPlayersThatClearedLevel4Obj('player_cleared_lvl_4');
 const isPlayingLevel4Obj = Objective.create('is_playing_lvl_4', 'dummy');
-const isPlayingLevel4 = isPlayingLevel4Obj('status');
+export const isPlayingLevel4 = isPlayingLevel4Obj('status');
 
 // setup
 export const setupLevel4: MCFunctionInstance<void> = MCFunction('levels/lvl4/setup', () => {
     isPlayingLevel4.set(1);
     gamemode('survival', Selector('@a', {
-        tag: ['!' + failedTag]
+        tag: ['!' + failedTag, `!${excluded}`]
     }));
 
-    tp('@a', infoLvl4.tp, infoLvl4.facing);
+    tp(Selector('@a', { tag: `!${excluded}` }), infoLvl4.tp, infoLvl4.facing);
     spawnpoint('@a', infoLvl4.tp);
     playsound('minecraft:block.note_block.chime', 'master', '@a', infoLvl4.tp, 1, 0.5);
     tellraw(Selector('@a', { gamemode: '!spectator' }),
@@ -32,7 +33,7 @@ export const setupLevel4: MCFunctionInstance<void> = MCFunction('levels/lvl4/set
                 text: "================ Level 4 ================\n",
                 color: "gray"
             }, {
-                text: "This is third level of the game. \n",
+                text: "This is forth level of the game. \n",
                 color: "gold"
             }, {
                 text: "You have to craft as many item as you can.\n",
@@ -55,7 +56,7 @@ export const setupLevel4: MCFunctionInstance<void> = MCFunction('levels/lvl4/set
         text: 'Timer for level 4',
         color: 'red'
     }]);
-    bossbar.set(bossbarName).players('@a');
+    bossbar.set(bossbarName).players(Selector('@a', {tag: `!${excluded}` }));
     bossbar.set(bossbarName).max(maxTime);
     bossbar.set(bossbarName).value(maxTime);
     bossbar.set(bossbarName).color('red');
@@ -68,7 +69,7 @@ export const setupLevel4: MCFunctionInstance<void> = MCFunction('levels/lvl4/set
 export const lvl4Complition: MCFunctionInstance<Promise<void>> = MCFunction('levels/lvl4/complition', async () => {
 
     await sleep('10t');
-    execute.as(Selector('@a', { tag: ['!' + failedTag] })).at(self).run(() => {
+    execute.as(Selector('@a', { tag: ['!' + failedTag, `!${excluded}`] })).at(self).run(() => {
         title(self).title([
             {
                 text: "You cleared Level 4!",
@@ -77,7 +78,7 @@ export const lvl4Complition: MCFunctionInstance<Promise<void>> = MCFunction('lev
         ]);
         playsound('minecraft:ui.toast.challenge_complete', 'master', self)
     })
-    effect.give('@a', 'minecraft:blindness', 3, 0, true);
+    effect.give(Selector('@a', { tag: `!${excluded}` }), 'minecraft:blindness', 3, 0, true);
     setupLevel5();
 })
 
@@ -91,7 +92,7 @@ export const startTimer: MCFunctionInstance<Promise<void>> = MCFunction('levels/
         if(i == 0){
             bossbar.remove(bossbarName);
             _.if(isPlayingLevel4.matches(1), () => {
-                tellraw(Selector('@a', { tag: `!${failedTag}`}), [
+                tellraw(Selector('@a', { tag: [ `!${failedTag}`, `!${excluded}` ]}), [
                     {
                         text: "========================================\n",
                         color: "gray"
@@ -106,9 +107,23 @@ export const startTimer: MCFunctionInstance<Promise<void>> = MCFunction('levels/
                         color: "gray"
                     }
                 ]);
-                clear('@a');
                 isPlayingLevel4.set(0);
+                clear(Selector('@a', { tag: `!${excluded}` }));
+                lockChest();
             })
         }
     }
 })
+
+// lock the chest 
+const lockChest = MCFunction('levels/lvl4/lock_chest', () => {
+    chestCoord.forEach((value) => {
+        data.merge.block(value, {
+            Lock: "Key"
+        })
+    })
+});
+
+MCFunction('levels/lvl4/give_key', () => {
+    give(self, 'minecraft:tripwire_hook' + `{display:{Name:'{"text":"Key","color":"gold","italic":false}'}}`);
+});

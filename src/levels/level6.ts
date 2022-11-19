@@ -1,5 +1,5 @@
 import { effect, execute, gamemode, MCFunction, MCFunctionInstance, playsound, Selector, sleep, spawnpoint, tellraw, title, tp } from "sandstone";
-import { clearedLevel5Tag, clearedLevel6Tag, failedTag, infoLvl6 } from "../constants";
+import { clearedLevel5Tag, clearedLevel6Tag, excluded, failedTag, infoLvl6 } from "../constants";
 import { self } from "../main";
 import { setupLevel7 } from "./level7";
 
@@ -16,11 +16,11 @@ const previousLevel: string = clearedLevel5Tag;
 // setup
 export const setupLevel6: MCFunctionInstance<void> = MCFunction('levels/lvl6/setup', () => {
     gamemode('survival', Selector('@a', {
-        tag: ['!' + failedTag]
+        tag: ['!' + failedTag, `!${excluded}`]
     }));
 
 
-    tp('@a', infoLvl6.tp, infoLvl6.facing);
+    tp(Selector('@a', { tag: `!${excluded}` }), infoLvl6.tp, infoLvl6.facing);
     spawnpoint('@a', infoLvl6.tp);
     playsound('minecraft:block.note_block.chime', 'master', '@a', infoLvl6.tp, 1, 0.5);
     tellraw(Selector('@a', { gamemode: '!spectator' }),
@@ -48,7 +48,7 @@ export const setupLevel6: MCFunctionInstance<void> = MCFunction('levels/lvl6/set
 export const lvl6Complition: MCFunctionInstance<Promise<void>> = MCFunction('levels/lvl6/complition', async () => {
 
     await sleep('10t');
-    execute.as(Selector('@a', { tag: [tagLevel, '!' + failedTag] })).at(self).run(() => {
+    execute.as(Selector('@a', { tag: [tagLevel, '!' + failedTag, `!${excluded}`] })).at(self).run(() => {
         title(self).title([
             {
                 text: "You cleared Level 6!",
@@ -57,6 +57,6 @@ export const lvl6Complition: MCFunctionInstance<Promise<void>> = MCFunction('lev
         ]);
         playsound('minecraft:ui.toast.challenge_complete', 'master', self)
     })
-    effect.give('@a', 'minecraft:blindness', 3, 0, true);
+    effect.give(Selector('@a', { tag: `!${excluded}` }), 'minecraft:blindness', 3, 0, true);
     setupLevel7();
 })
