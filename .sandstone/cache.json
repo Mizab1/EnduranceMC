@@ -5,7 +5,7 @@
       "data\\endurance\\functions\\give_book.mcfunction": "bdc34180ce6cb70b8fac018654af9c80",
       "data\\endurance\\functions\\send_start_msg.mcfunction": "531ba5b7c71ab4acbd9e6264cfeafd98",
       "data\\endurance\\functions\\tp_to_hub.mcfunction": "444fd9cf2399947a9c60a1a4107e6d53",
-      "data\\endurance\\functions\\levels\\lvl7\\setup.mcfunction": "4a692ec97287a79dd735a0fc40a53ad5",
+      "data\\endurance\\functions\\levels\\lvl7\\setup.mcfunction": "f79c0f7656ecef67bd7af6d0f3980e4d",
       "data\\endurance\\functions\\levels\\lvl7\\complition.mcfunction": "0d8614ff89a60c4040328ffd5e023fe9",
       "data\\endurance\\functions\\levels\\lvl7\\complition\\__sleep.mcfunction": "062fa293a1b341eef533ad5db8875e90",
       "data\\endurance\\functions\\levels\\lvl7\\complition\\__sleep\\execute_as.mcfunction": "6c9ce3bcfc612addc4c8576ecaecebf2",

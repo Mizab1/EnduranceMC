@@ -46,7 +46,7 @@ export const setupLevel7: MCFunctionInstance<void> = MCFunction('levels/lvl7/set
     // edit worldborder
     raw(`worldborder center ${infoLvl7.worldBorder}`);
     worldborder.set(500);
-    worldborder.set(30, 20);
+    worldborder.set(30, 300);
     worldborder.damageAmount(50);
     worldborder.damageBuffer(0);
 })
