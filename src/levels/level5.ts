@@ -7,7 +7,7 @@ import { setupLevel6 } from "./level6";
 const tagLevel: string = clearedLevel5Tag;
 const previousLevel: string = clearedLevel4Tag;
 
-const clearBlockTime: TimeArgument = '2s';
+const clearBlockTime: TimeArgument = '45s';
 export const alreadyInBoxLvl5 = 'already_in_box_lvl5';
 
 const isPlayingLevel5Obj = Objective.create('is_playing_lvl_5', 'dummy');
